@@ -35,14 +35,13 @@ const schema = z
       .min(3, { message: "Last name must have at least 3 characters" }),
     email: z.string().email({ message: "Invalid email format" }),
     plan: z.enum(["funrun", "mini", "half", "full"], {
-      errorMap: (issue, ctx) => ({ message: "Please select a plan" }),
+      errorMap: () => ({ message: "Please select a plan" }),
     }),
     gender: z.enum(["male", "female"], {
-      errorMap: (issue, ctx) => ({ message: "Please choose a gender" }),
+      errorMap: () => ({ message: "Please choose a gender" }),
     }),
     acceptTermsAndConds: z.literal(true, {
-      // message: "You must accept terms and conditions",
-      errorMap: (issue, ctx) => ({
+      errorMap: () => ({
         message: "You must accept terms and conditions",
       }),
     }),
@@ -52,19 +51,11 @@ const schema = z
     confirmPassword: z.string(),
   })
   .refine(
-    //refine allows you check error in your own way
-    //in this example, we check "hasCoupon" with "coupon" fields
     (data) => {
-      // if user does not tick "I have coupon", then it's ok
       if (!data.hasCoupon) return true;
-
-      // if user tick "I have coupon" and fill correct code, then it's ok too
       if (data.hasCoupon && data.coupon === "CMU2023") return true;
-
-      // ticking "I have coupon" but fill wrong coupon code, show error
       return false;
     },
-    //set error message and the place it should show
     {
       message: "Invalid coupon code",
       path: ["coupon"],
@@ -117,7 +108,7 @@ export default function Home() {
         <Space h="lg" />
 
         {/* add form */}
-        <form onSubmit={form.onSubmit((v) => alert("See you at CMU Marathon"))}>
+        <form onSubmit={form.onSubmit(() => alert("See you at CMU Marathon"))}>
           <Stack gap="sm">
             <Group grow align="start">
               <TextInput
